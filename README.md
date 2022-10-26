@@ -12,9 +12,11 @@ erDiagram
     Round ||--|{ User_Round_Hand : "has three"
     Round ||--|| Hidden_Hand : "has one"
     Round ||--o{ Bid : "can have multiple"
+    Round ||--|| Round_Order : "has one"
+    Round_Order ||--|{ User : "has three"
     User ||--o{ Bid : "can have multiple"
     Hidden_Hand ||--|{ Card : "has three"
     User_Round_Hand ||--|{ Card : "has multiple"
     Card ||--|| Suit : "has one"
-    Card ||--|| Card_Value : "has one"
+    Card ||--|| Rank : "has one"
 ```
