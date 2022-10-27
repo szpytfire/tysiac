@@ -1,10 +1,9 @@
-interface Game {
-  users: User[]
-  totalScores: TotalScore[]
-  rounds: Round[]
+export interface IGame {
+  users: IUser[]
+  rounds: IRound[]
 }
 
-interface User {
+export interface IUser {
   id: string
   totalScore: TotalScore
 }
@@ -13,53 +12,53 @@ interface TotalScore {
   value: number
 }
 
-interface Round {
+export interface IRound {
   tricks: Trick[]
   userRoundHands: UserRoundHand[]
-  hiddenHand: HiddenHand[]
+  hiddenHand: HiddenHand
   bids: Bid[]
   roundOrder: RoundOrder
 }
 
 interface RoundOrder {
-  player1: User
-  player2: User
-  player3: User
+  player1: string // user id
+  player2: string // user id
+  player3: string // user id
 }
 
 interface Bid {
-  user: User
+  userId: string
   value: number
 }
 
 interface Trick {
-  user: User
+  userId: string
   value: number
 }
 
 interface UserRoundHand {
-  user: User
-  cards: Card[]
+  userId: string
+  cards: ICard[]
 }
 
 interface HiddenHand {
-  cards: Card[]
+  cards: ICard[]
 }
 
-interface Card {
-  suit: Suit
-  rank: Rank
+export interface ICard {
+  suit: ISuit
+  rank: IRank
   value: number
 }
 
-enum Suit {
+export enum ISuit {
   HEART = 'HEART',
   DIAMOND = 'DIAMOND',
   SPADE = 'SPADE',
   CLUB = 'CLUB',
 }
 
-enum Rank {
+export enum IRank {
   NINE = 'NINE',
   TEN = 'TEN',
   JACK = 'JACK',
