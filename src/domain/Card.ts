@@ -15,6 +15,7 @@ export class Card implements ICard {
       case 'TEN': return 10
       case 'QUEEN': return 4
       case 'KING': return 5
+      default: throw new Error('')
     }
   }
 }

@@ -5,9 +5,7 @@ export const NUM_HIDDEN_CARDS = 3
 export const NUM_USER_ROUND_CARDS = 7
 
 export class Deck {
-  private cards: ICard[]
-
-  public constructor() {
+  public constructor(private cards: ICard[] = []) {
     this.build()
     this.shuffle()
   }
