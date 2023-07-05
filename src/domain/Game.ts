@@ -1,6 +1,7 @@
 import type { ICard, IGame, IPlayer, IRound, IRoundOrder } from './interfaces'
 import { GAME_DURATION, IBid } from './interfaces'
 import { DEFAULT_BID, PASS_BID, Round } from './Round'
+import { BidDTO } from "../api/dtos";
 
 export class Game implements IGame {
   rounds: IRound[]
@@ -53,52 +54,47 @@ export class Game implements IGame {
   }
 
   public getMusikPlayer(round: number): IPlayer['userId'] {
-    return this.rounds[round].bids[0].userId;
+    return this.rounds[round].roundOrder.player1Id;
   }
 
   public hasNextBidUser(round: number): boolean {
-    const bids = this.rounds[round].bids;
+    const { bids } = this.rounds[round];
 
-    return bids.length !== 3 || bids.find(d => d.value !== DEFAULT_BID && d.value !== PASS_BID) !== undefined;
-  }
-
-  public getNextBidUser(round: number): IPlayer['userId'] {
-    const r = this.rounds[round];
-    const bids = r.bids;
-
-    if (bids.length === 1) {
-      return r.roundOrder.player2Id;
-    }
-
-    if (bids.length === 2) {
-      return r.roundOrder.player3Id;
-    }
-
-    const nextBid = bids.find(d => d.value !== PASS_BID);
-
-    if (!nextBid) {
-      throw new Error('Next bid is undefined');
-    }
-
-    return nextBid.userId;
-  }
-
-  public submitBid(round: number, {userId, value}: IBid): boolean {
-    const r = this.rounds[round];
-
-    if (r.bids.length < 3) {
-      r.bids.push({userId, value});
+    if (Object.keys(bids).length < 3) {
       return true;
     }
 
-    const userBidIdx = r.bids.findIndex(u => userId === u.userId);
+    return Object.values(bids).filter(v => v !== PASS_BID).length >= 2;
+  }
 
-    if (userBidIdx === -1) {
-      throw new Error(`Cannot find bid for user with id [${userId}]`)
+  public getNextBidUser(round: number): IPlayer['userId'] {
+    const { roundOrder, bids } = this.rounds[round];
+
+    const numBids = Object.keys(bids).length;
+
+    if (numBids === 1) {
+      return roundOrder.player2Id;
     }
 
-    r.bids[userBidIdx] = {userId, value};
+    if (numBids === 2) {
+      return roundOrder.player3Id;
+    }
 
+    if (bids[roundOrder.player1Id] === DEFAULT_BID) {
+      return roundOrder.player1Id;
+    }
+
+    const lowest = Object.entries(bids).filter(d => d[1] !== PASS_BID).reduce(
+        (acc, loc) => acc[1] < loc[1] ? acc : loc
+    )
+
+    return lowest[0];
+  }
+
+  public submitBid(round: number, {userId, value}: BidDTO): boolean {
+    const r = this.rounds[round];
+
+    r.bids[userId] = value;
     return true;
   }
 }

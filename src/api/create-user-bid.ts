@@ -1,9 +1,9 @@
 import { IContext } from '../context/interfaces'
 import { Game } from '../domain/Game'
-import { PlayerHandDTO } from './dtos'
+import { BidDTO, PlayerHandDTO } from './dtos'
 import { IBid, IPlayer } from "../domain/interfaces";
 
-export const createUserBid = async (context: IContext, gameId: string, round: number, bid: IBid): Promise<boolean> => {
+export const createUserBid = async (context: IContext, gameId: string, round: number, bid: BidDTO): Promise<boolean> => {
     const {db} = context
     // TODO: create more of a repository pattern here
     const _game = await db.findOne(gameId)

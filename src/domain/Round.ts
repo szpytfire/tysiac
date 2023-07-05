@@ -8,13 +8,15 @@ export class Round implements IRound {
   tricks: ITrick[]
   userRoundHands: IUserRoundHand[]
   hiddenHand: IHiddenHand
-  bids: IBid[]
+  bids: IBid
   roundOrder: IRoundOrder
 
   public constructor({player1Id, player2Id, player3Id}: IRoundOrder) {
     const deck = new Deck()
 
-    this.bids = [{userId: player3Id, value: DEFAULT_BID}]
+    this.bids = {
+      [player3Id]: DEFAULT_BID
+    }
 
     this.roundOrder = {
       player1Id: player3Id,

@@ -14,7 +14,7 @@ export interface IRound {
   tricks: ITrick[]
   userRoundHands: IUserRoundHand[]
   hiddenHand: IHiddenHand
-  bids: IBid[]
+  bids: IBid
   roundOrder: IRoundOrder
 }
 
@@ -25,8 +25,7 @@ export interface IRoundOrder {
 }
 
 export interface IBid {
-  userId: string
-  value: number
+  [userId: string]: number
 }
 
 export interface ITrick {
