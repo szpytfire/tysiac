@@ -5,11 +5,18 @@ import { createPlayer } from './api/create-player'
 import { getPlayerCards } from './api/get-player-cards'
 import { GAME_DURATION } from './domain/interfaces'
 import { startGame } from './api/start-game'
+import { getHasNextBidPlayer } from "./api/get-has-next-bid-player";
+import { getNextBidPlayer } from "./api/get-next-bid-player";
+import { getMusikPlayer } from "./api/get-musik-player";
+import prompt from 'prompt';
+import { createUserBid } from "./api/create-user-bid";
 
 const play = async () => {
   // Switch db depending on how you want to play
   const db = new InMemoryDb()
   const context: IContext = {db}
+
+  prompt.start();
 
   // Create game
   const game = await createGame(context, GAME_DURATION.QUICK)
@@ -27,9 +34,24 @@ const play = async () => {
   const cards2 = await getPlayerCards(context, game.id, 0, 'Martyna')
   const cards3 = await getPlayerCards(context, game.id, 0, 'Dzydz')
 
-  console.log(cards1)
-  console.log(cards2)
-  console.log(cards3)
+  const musikPlayer = await getMusikPlayer(context, game.id, 0);
+
+  console.log('musik player', musikPlayer);
+
+  let hasNextBidPlayer = await getHasNextBidPlayer(context, game.id, 0);
+
+  while (hasNextBidPlayer) {
+    const nextBidPlayer = await getNextBidPlayer(context, game.id, 0);
+
+    console.log('next bid player', nextBidPlayer);
+
+    const res = await prompt.get(['bid']);
+
+    await createUserBid(context, game.id, 0, {userId: nextBidPlayer, value: Number(res.bid)})
+
+    hasNextBidPlayer = await getHasNextBidPlayer(context, game.id, 0);
+  }
+
 }
 
 play()

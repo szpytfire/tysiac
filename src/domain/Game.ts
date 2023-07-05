@@ -1,6 +1,6 @@
 import type { ICard, IGame, IPlayer, IRound, IRoundOrder } from './interfaces'
-import { GAME_DURATION } from './interfaces'
-import { Round } from './Round'
+import { GAME_DURATION, IBid } from './interfaces'
+import { DEFAULT_BID, PASS_BID, Round } from './Round'
 
 export class Game implements IGame {
   rounds: IRound[]
@@ -46,5 +46,59 @@ export class Game implements IGame {
   public getPlayerCards(round: number, uid: string): ICard[] {
     // TODO: add some error handling, e.g. if input round length is greater than array length
     return this.rounds[round].userRoundHands.find(({userId}) => uid === userId)!.cards
+  }
+
+  public getHiddenCards(round: number): ICard[] {
+    return this.rounds[round].hiddenHand.cards;
+  }
+
+  public getMusikPlayer(round: number): IPlayer['userId'] {
+    return this.rounds[round].bids[0].userId;
+  }
+
+  public hasNextBidUser(round: number): boolean {
+    const bids = this.rounds[round].bids;
+
+    return bids.length !== 3 || bids.find(d => d.value !== DEFAULT_BID && d.value !== PASS_BID) !== undefined;
+  }
+
+  public getNextBidUser(round: number): IPlayer['userId'] {
+    const r = this.rounds[round];
+    const bids = r.bids;
+
+    if (bids.length === 1) {
+      return r.roundOrder.player2Id;
+    }
+
+    if (bids.length === 2) {
+      return r.roundOrder.player3Id;
+    }
+
+    const nextBid = bids.find(d => d.value !== PASS_BID);
+
+    if (!nextBid) {
+      throw new Error('Next bid is undefined');
+    }
+
+    return nextBid.userId;
+  }
+
+  public submitBid(round: number, {userId, value}: IBid): boolean {
+    const r = this.rounds[round];
+
+    if (r.bids.length < 3) {
+      r.bids.push({userId, value});
+      return true;
+    }
+
+    const userBidIdx = r.bids.findIndex(u => userId === u.userId);
+
+    if (userBidIdx === -1) {
+      throw new Error(`Cannot find bid for user with id [${userId}]`)
+    }
+
+    r.bids[userBidIdx] = {userId, value};
+
+    return true;
   }
 }
